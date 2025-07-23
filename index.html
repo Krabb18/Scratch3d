@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/6.20210701.0/blockly_compressed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/6.20210701.0/blocks_compressed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/6.20210701.0/msg/en.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/6.20210701.0/javascript_compressed.min.js"></script>
+
+    <title>Scratch3d</title>
+
+    <style>
+      #myCanvasContainer {
+        width: 1000px;
+        height: 600px;
+        border: 1px solid #ccc;
+      }
+    </style>
+</head>
+<body>
+    <div id="buttonContainer"></div>
+    <button id="testbtn">testbutton</button>
+
+
+   <xml id="toolbox" style="display: none">
+  <category name="Kontrolle">
+    <block type="controls_if"></block>
+    <block type="logic_compare"></block>
+    <block type="controls_ifelse"></block>
+    <block type="math_number"></block>
+    <block type="text"></block>
+    <block type="text_print"></block>
+    <block type="say_hello"></block>
+  </category>
+  <category name="Variablen" custom="VARIABLE"></category>
+</xml>
+
+
+    <div id="myCanvasContainer"></div>
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
