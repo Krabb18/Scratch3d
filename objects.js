@@ -1,4 +1,6 @@
 import * as THREE from 'https://unpkg.com/three@0.178.0/build/three.module.js?module';
+import { sayHelloTest } from './blockyfuncs.js';
+import { moveAxis } from './blockyfuncs.js';
 
 //here function to create new Workspace
 export function createNewWorkSpace(gameObject, gameObjectsList)
@@ -39,13 +41,6 @@ export function createNewWorkSpace(gameObject, gameObjectsList)
     container.appendChild(button);
 }
 
-function sayHelloTest(times, message)
-{
-    for(let i = 0; i<times; i++)
-    {
-        alert(message);
-    }
-}
 
 
 class GameObject
@@ -53,11 +48,21 @@ class GameObject
     constructor()
     {
         this.name = "Empty";
+
         this.positionX = 0.0;
         this.positionY = 0.0;
         this.positionZ = 0.0;
 
+        this.rotationX = 0.0;
+        this.rotationY = 0.0;
+        this.rotationZ = 0.0;
+
+        this.scaleX = 0.0;
+        this.scaleY = 0.0;
+        this.scaleZ = 0.0;
+
         this.workSpace = null;
+        this.currentKey = 'None';
 
         //nachher noch scale usw
     }
@@ -65,6 +70,16 @@ class GameObject
     update()
     {
         console.log("was geht original");
+    }
+
+    playmodeInit()
+    {
+        console.log("Playmode original");
+    }
+
+    playmodeDeInit()
+    {
+        console.log("Playmode deinit original");
     }
 
     testcode()
@@ -77,7 +92,7 @@ export{GameObject}
 
 class CubeObject extends GameObject
 {
-    constructor(scene)
+    constructor(scene, gameObjectsList)
     {
         super();
 
@@ -85,6 +100,39 @@ class CubeObject extends GameObject
         this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         this.cube = new THREE.Mesh(this.geometry, this.material);
         scene.add(this.cube);
+
+        this.gameObjectsList = gameObjectsList;
+        this.modelMatSafe = this.cube.matrix.clone();
+    }
+    
+    playmodeInit()
+    {
+        this.modelMatSafe = this.cube.matrix.clone();
+
+        this.positionX = this.cube.position.x;
+        this.positionY = this.cube.position.y;
+        this.positionZ = this.cube.position.z;
+
+        this.rotationX = this.cube.rotation.x;
+        this.rotationY = this.cube.rotation.y;
+        this.rotationZ = this.cube.rotation.z;
+
+        this.scaleX = this.cube.scale.x;
+        this.scaleY = this.cube.scale.y;
+        this.scaleZ = this.cube.scale.z;
+    }
+
+    playmodeDeInit()
+    {
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
+
+        this.modelMatSafe.decompose(position, quaternion, scale);
+        this.cube.position.copy(position);
+        const rotation = new THREE.Euler().setFromQuaternion(quaternion);
+        this.cube.rotation.copy(rotation);
+        this.cube.scale.copy(scale);
     }
 
     update()
