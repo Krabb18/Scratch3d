@@ -24,6 +24,9 @@
 
     <button id="playButton">Play</button>
     <button id="backgroundButton">Background</button>
+    <button id="assetButtonWav">Add Music</button>
+    <button id="addCube">Add Cube</button>
+    <button id="addModel">Add Model</button>
 
 
    <xml id="toolbox" style="display: none">
@@ -81,7 +84,11 @@
     <block type="say_hello"></block>
     <block type="moveX"></block>
     <block type="button"></block>
+    <block type="playSound"></block>
+    <block type="stopSound"></block>
+    <block type="changeAnimation"></block>
     <block type="currentPressedKey"></block>
+    <block type="started"></block>
 </category>
 
   <category name="Variablen" custom="VARIABLE"></category>
@@ -89,8 +96,10 @@
 
 <div>
     <input type="file" id="fileInput" style="display: none;" />
+    <input type="file" id="fileInputWav" style="display: none;" />
   </div>
-    <div id="myCanvasContainer"></div>
+ 
+    <div id="myCanvasContainer" style="width:1000px; height:600px; border:1px solid black; overflow:auto; margin-left:1300px; margin-top: 40px;"></div>
     <script type="module" src="/main.js"></script>
 </body>
 </html>

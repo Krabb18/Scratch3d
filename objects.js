@@ -1,17 +1,21 @@
 import * as THREE from 'https://unpkg.com/three@0.178.0/build/three.module.js?module';
+import { GLTFLoader } from 'https://unpkg.com/three@0.178.0/examples/jsm/loaders/GLTFLoader.js?module';
 import { sayHelloTest } from './blockyfuncs.js';
 import { moveAxis } from './blockyfuncs.js';
+import { playSound } from './blockyfuncs.js';
+import { changeAnimation } from './blockyfuncs.js';
 
 //here function to create new Workspace
 export function createNewWorkSpace(gameObject, gameObjectsList)
 {
     const newDiv = document.createElement('div');
     newDiv.id = gameObject.name; //die id ist die slebe wie der name vom gameobecjt was gescripted wird
-    newDiv.style.width = "1000px";
-    newDiv.style.height = "800px";
+    newDiv.style.width = "1200px";
+    newDiv.style.height = "1000px";
     newDiv.style.border = "1px solid black";
-    newDiv.style.marginTop = "10px";
-
+    newDiv.style.position = 'absolute';
+    newDiv.style.left = '0px';
+    newDiv.style.top = '100px';
     document.body.appendChild(newDiv);
 
 
@@ -42,10 +46,30 @@ export function createNewWorkSpace(gameObject, gameObjectsList)
 }
 
 
+class AssetContainer
+{
+    constructor(listener)
+    {
+        this.musicFiles = new Map();
+        this.listener = listener;
+    }
+
+    addFile(file, type)
+    {
+        if(type == "Music")
+        {
+            const objectURL = URL.createObjectURL(file);
+            this.musicFiles.set(file.name, objectURL);
+            console.log("Added: ", file.name);
+        }
+    }
+}
+export{AssetContainer}
+
 
 class GameObject
 {
-    constructor()
+    constructor(scene, gameObjectsList, assetConatiner)
     {
         this.name = "Empty";
 
@@ -61,8 +85,17 @@ class GameObject
         this.scaleY = 0.0;
         this.scaleZ = 0.0;
 
+
         this.workSpace = null;
         this.currentKey = 'None';
+        this.started = false;
+
+        this.gameObjectsList = gameObjectsList;
+        this.assetConatiner = assetConatiner;
+
+        this.audioLoader = new THREE.AudioLoader();
+        this.sound = new THREE.Audio(assetConatiner.listener);
+        this.scene = scene;
 
         //nachher noch scale usw
     }
@@ -90,18 +123,103 @@ class GameObject
 }
 export{GameObject}
 
+
+class ModelObject extends GameObject
+{
+    constructor(scene, gameObjectsList, assetConatiner, modelPath)
+    {
+        super(scene, gameObjectsList, assetConatiner);
+
+        this.loader = new GLTFLoader();
+        //this.model;
+        this.animator;
+        this.loader.load(
+            modelPath,
+            (gltf) =>
+            {
+                this.gltf = gltf;
+                this.model = gltf.scene;
+                this.model.position.set(0, 0, 0);
+                this.model.scale.set(1, 1, 1);
+
+                this.modelMatSafe = this.model.matrix.clone();
+
+                this.animator = new THREE.AnimationMixer(this.model);
+                const action = this.animator.clipAction(gltf.animations[0]);
+                action.play();
+
+                this.scene.add(this.model);
+            },
+            undefined,
+            function(error)
+            {
+                console.log("Fehler beim laden", error);
+            }
+        )
+
+        //this.scene.add(this.cube);
+
+    }
+
+    playmodeInit()
+    {
+        this.modelMatSafe = this.model.matrix.clone();
+
+        this.positionX = this.model.position.x;
+        this.positionY = this.model.position.y;
+        this.positionZ = this.model.position.z;
+
+        this.rotationX = this.model.rotation.x;
+        this.rotationY = this.model.rotation.y;
+        this.rotationZ = this.model.rotation.z;
+
+        this.scaleX = this.model.scale.x;
+        this.scaleY = this.model.scale.y;
+        this.scaleZ = this.model.scale.z;
+    }
+
+    playmodeDeInit()
+    {
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
+
+        this.modelMatSafe.decompose(position, quaternion, scale);
+        this.model.position.copy(position);
+        const rotation = new THREE.Euler().setFromQuaternion(quaternion);
+        this.model.rotation.copy(rotation);
+        this.model.scale.copy(scale);
+    }
+
+    update()
+    {
+        this.model.position.x = this.positionX;
+        this.model.position.y = this.positionY;
+        this.model.position.z = this.positionZ;
+
+        if(this.animator)
+        {
+            this.animator.update(1.0/60.0);   
+        }
+
+        console.log("was geht model");
+    }
+}
+export{ModelObject}
+
+
 class CubeObject extends GameObject
 {
-    constructor(scene, gameObjectsList)
+    constructor(scene, gameObjectsList, assetConatiner)
     {
-        super();
+        super(scene, gameObjectsList, assetConatiner);
 
         this.geometry = new THREE.BoxGeometry(1, 1, 1);
         this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         this.cube = new THREE.Mesh(this.geometry, this.material);
-        scene.add(this.cube);
 
-        this.gameObjectsList = gameObjectsList;
+        this.scene.add(this.cube);
+
         this.modelMatSafe = this.cube.matrix.clone();
     }
     

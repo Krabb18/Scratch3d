@@ -1,3 +1,7 @@
+import * as THREE from 'https://unpkg.com/three@0.178.0/build/three.module.js?module';
+
+const allSounds = [];
+
 export function sayHelloTest(times, message)
 {
     for(let i = 0; i<times; i++)
@@ -22,6 +26,26 @@ export function moveAxis(axis, num, gameObjects, name)
     }
     console.log("HAT GEKLAPPT VIELLECIHT");
 }
+
+export function playSound(audioLoader, listener, soundFile, sound)
+{
+    allSounds.push(sound);
+    audioLoader.load(soundFile, (buffer) =>{
+        sound.setBuffer(buffer);
+        sound.setLoop(false);
+        sound.setVolume(0.5);
+        sound.play();
+    });
+}
+
+
+export function changeAnimation(animator, gltf, index)
+{
+    const action = animator.clipAction(gltf.animations[index]);
+    action.play();
+    console.log("HAT GEKLAPPT ANIMATION CHANGE");
+}
+
 
 let currentKey = 'None';
 
