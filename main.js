@@ -9,8 +9,10 @@ import { AssetContainer } from './objects.js';
 import { createNewWorkSpace } from './objects.js';
 import { getCurrentKey } from './blockyfuncs.js';
 
+import { getSelectedObjectIndex } from './objects.js';
+
 let playMode = false;
-let selectedObjectIndex = "Cube0";
+let selectedObjectIndex = "Model0";
 
 function defineCustomBlocks()
 {
@@ -302,7 +304,7 @@ function openFileDialogWav()
 function openFileDialogModel()
 {
     loadNumber = 2;
-    document.getElementById('fileInput').click();
+    document.getElementById('fileInputModel').click();
     console.log("model clicked");
 }
 
@@ -349,18 +351,23 @@ document.getElementById('fileInput').addEventListener('change', function(event)
             console.log(file.name);
             assetContainer.addFile(file, "Music");
         }
-        else if(loadNumber == 2)
-        {
-            const modelURL = URL.createObjectURL(file);
-            let modelInst = new ModelObject(scene, gameObjectsList, assetContainer, modelURL);
-            modelInst.name = "Model" + gameObjectsList.size.toString();
-            gameObjectsList.set(modelInst.name, modelInst);
-        }
     }
 });
 
 
+document.getElementById("fileInputModel").addEventListener('change', function(event){
 
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    let modelInst = new ModelObject(scene, gameObjectsList, assetContainer, url);
+    modelInst.name = "Model" + gameObjectsList.size.toString();
+    gameObjectsList.set(modelInst.name, modelInst);
+
+    createNewWorkSpace(modelInst, gameObjectsList, Blockly, selectedObjectIndex);
+
+});
 
 
 transformControls.addEventListener('dragging-changed', function(event) {
@@ -369,6 +376,7 @@ transformControls.addEventListener('dragging-changed', function(event) {
 
 function update()
 {
+    let selectedObjectIndex = getSelectedObjectIndex();
     if(playMode)
     {
         for (const [key, obj] of gameObjectsList) {
@@ -397,8 +405,8 @@ function update()
 
         if(gameObjectsList.has(selectedObjectIndex))
         {
-            if(gameObjectsList.get(selectedObjectIndex) instanceof ModelObject){transformControls.attach(gameObjectsList.get(selectedObjectIndex).model);}
-            else if(gameObjectsList.get(selectedObjectIndex) instanceof CubeObject){transformControls.attach(gameObjectsList.get(selectedObjectIndex).cube);}
+            if(gameObjectsList.get(selectedObjectIndex) instanceof ModelObject){transformControls.attach(gameObjectsList.get(selectedObjectIndex).model); console.log("Model");}
+            else if(gameObjectsList.get(selectedObjectIndex) instanceof CubeObject){transformControls.attach(gameObjectsList.get(selectedObjectIndex).cube); console.log("Cube");}
             
         }
 

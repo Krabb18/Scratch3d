@@ -6,7 +6,14 @@ import { playSound } from './blockyfuncs.js';
 import { changeAnimation } from './blockyfuncs.js';
 
 //here function to create new Workspace
-export function createNewWorkSpace(gameObject, gameObjectsList)
+let selectedObjectIndex = "Model0";
+
+export function getSelectedObjectIndex()
+{
+    return selectedObjectIndex;
+}
+
+export function createNewWorkSpace(gameObject, gameObjectsList, Blockly)
 {
     const newDiv = document.createElement('div');
     newDiv.id = gameObject.name; //die id ist die slebe wie der name vom gameobecjt was gescripted wird
@@ -39,7 +46,7 @@ export function createNewWorkSpace(gameObject, gameObjectsList)
 
         document.getElementById(newDiv.id).style.display = 'block';
         console.log("Button gedrückt")
-
+        selectedObjectIndex = gameObject.name;
     });
 
     container.appendChild(button);
